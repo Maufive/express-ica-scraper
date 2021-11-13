@@ -8,8 +8,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Ingredient {
+  amount   String
+  name     String
+  id       String  @id @unique @default(dbgenerated()) @map("_id") @db.ObjectId
+  Recipe   Recipe? @relation(fields: [recipeId], references: [id])
+  recipeId String? @unique @db.ObjectId
+}
+
 model Recipe {
-  id                  String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id                  String       @id @unique @default(dbgenerated()) @map("_id") @db.ObjectId
   title               String
   description         String
   imageSrc            String
@@ -17,5 +25,10 @@ model Recipe {
   time                String
   amountOfIngredients String
   difficulty          String
-  createdAt           DateTime @default(now()) @map(name: "created_at")
+  createdAt           DateTime     @default(now()) @map(name: "created_at")
+  ingredients         Ingredient[]
+  categories          String[]
+  url                 String       @unique
+
+  @@map(name: "recipes")
 }

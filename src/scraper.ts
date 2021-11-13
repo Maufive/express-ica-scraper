@@ -9,9 +9,9 @@ interface Ingredient {
 }
 
 interface Recipe {
-  title: String;
-  description: string | null;
-  imageSrc: string | null;
+  title: string;
+  description: string;
+  imageSrc: string;
   ratings: string;
   time: string;
   difficulty: string;
