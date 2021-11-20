@@ -1,5 +1,5 @@
 import express from 'express';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import recipeScraper from './scraper';
 
 const prisma = new PrismaClient();
@@ -19,6 +19,7 @@ app.post('/api/recipe', async (req, res) => {
     });
 
     if (alreadyExists) {
+      console.log('RECIPE ALREADY EXISTS IN THE DB !!! ');
       return res.json({ message: 'Recepted finns redan i databasen', status: 409 });
     }
   } catch (error) {
@@ -30,7 +31,7 @@ app.post('/api/recipe', async (req, res) => {
   if (!result) return null;
 
   // eslint-disable-next-line max-len
-  const ingredients = result.ingredients?.map((ingredient: Prisma.IngredientCreateInput) => ({ amount: ingredient?.amount, name: ingredient?.name }));
+  // const ingredients = result.ingredients.map((ingredient: Prisma.IngredientCreateInput) => ingredient);
 
   const recipe = await prisma.recipe.create({
     data: {
@@ -44,11 +45,11 @@ app.post('/api/recipe', async (req, res) => {
       url: result.url,
       categories: result.categories,
       ingredients: {
-        create: ingredients,
+        create: result.ingredients.filter((item) => item.name),
       },
     },
   });
-
+  console.log('saved recipe!');
   return res.json(recipe);
 });
 
