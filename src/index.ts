@@ -38,6 +38,7 @@ app.post('/api/recipe', async (req, res) => {
       title: result.title,
       description: result.description,
       imageSrc: result.imageSrc,
+      rating: result.rating,
       ratings: result.ratings,
       time: result.time,
       difficulty: result.difficulty,
