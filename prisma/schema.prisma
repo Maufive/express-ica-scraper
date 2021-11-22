@@ -30,4 +30,5 @@ model Recipe {
   ingredients         Ingredient[]
   categories          String[]
   url                 String       @unique
+  steps               String[]
 }

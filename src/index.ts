@@ -31,7 +31,6 @@ app.post('/api/recipe', async (req, res) => {
   if (!result) return null;
 
   // eslint-disable-next-line max-len
-  // const ingredients = result.ingredients.map((ingredient: Prisma.IngredientCreateInput) => ingredient);
 
   const recipe = await prisma.recipe.create({
     data: {
@@ -48,6 +47,7 @@ app.post('/api/recipe', async (req, res) => {
       ingredients: {
         create: result.ingredients.filter((item) => item.name),
       },
+      steps: result.steps,
     },
   });
   console.log('saved recipe!');
