@@ -29,7 +29,6 @@ async function scraper(url: string): Promise<Recipe | null> {
   try {
     console.log('Opening the browser......');
     browser = await puppeteer.launch({
-      headless: false,
       args: ['--disable-setuid-sandbox', '--no-sandbox'],
     });
   } catch (err) {
