@@ -13,11 +13,33 @@ client.connect();
 const database = client.db('recept');
 
 const app = express();
-app.use(cors());
+
+const whitelist = [
+  'http://localhost:3000',
+  'nextjs-ica-scraper-mousetrap.vercel.app',
+  'nextjs-ica-scraper.vercel.app',
+  'nextjs-ica-scraper-git-main-mousetrap.vercel.app',
+];
+
+const corsOptions = {
+  origin(origin: string, callback: (arg0: Error | null, arg1?: boolean | undefined) => void) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/api/search', async (req, res) => {
   const searchQuery = req.query?.query;
+
+  if (!searchQuery) {
+    return res.json([]);
+  }
 
   const query = { $text: { $search: searchQuery } };
   const sort = { score: { $meta: 'textScore' } };
