@@ -2,13 +2,40 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import recipeScraper from './scraper';
 
+const { MongoClient } = require('mongodb');
+
 const prisma = new PrismaClient();
 const cors = require('cors');
 require('dotenv').config({ path: '.env' });
 
+const client = new MongoClient(process.env.DATABASE_URL);
+client.connect();
+const database = client.db('recept');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.get('/api/search', async (req, res) => {
+  const searchQuery = req.query?.query;
+
+  const query = { $text: { $search: searchQuery } };
+  const sort = { score: { $meta: 'textScore' } };
+  const projection = {
+    _id: 1,
+    title: 1,
+  };
+
+  const recipes = database.collection('Recipe');
+  const result = await recipes
+    .find(query)
+    .project(projection)
+    .sort(sort)
+    .limit(10)
+    .toArray();
+
+  return res.json(result);
+});
 
 app.post('/api/recipe', async (req, res) => {
   const { url } = req.body;
