@@ -23,6 +23,14 @@ interface Recipe {
   steps: string[];
 }
 
+function getElementTextContent(element: Element): string {
+  if (element && element.textContent) {
+    return element.textContent.trim();
+  }
+
+  return '';
+}
+
 async function scraper(url: string): Promise<Recipe | null> {
   let browser;
 
@@ -41,13 +49,13 @@ async function scraper(url: string): Promise<Recipe | null> {
   await page.goto(url);
   await page.waitForSelector('.recipe-page-section');
 
-  const title = await page.$eval('.recipe-header__title', (el: Element) => el.textContent || MISSING_PROPERTY);
+  const title = await page.$eval('.recipe-header__title', (el: Element) => getElementTextContent(el));
   const rating = await page.$eval('.recipe-rating .rating-wrapper', (el: Element) => el.getAttribute('title') || MISSING_PROPERTY);
-  const ratings = await page.$eval('.ratings > span', (el: Element) => el.textContent || MISSING_PROPERTY);
-  const description = await page.$eval('.recipe-header__preamble > p', (el: Element) => el.textContent || MISSING_PROPERTY);
-  const time = await page.$eval('.recipe-header__summary > a', (el: Element) => el.textContent?.trim() || MISSING_PROPERTY);
-  const amountOfIngredients = await page.$eval('.recipe-header__summary > a:nth-child(2)', (el: Element) => el.textContent?.trim() || MISSING_PROPERTY);
-  const difficulty = await page.$eval('.recipe-header__summary > a:nth-child(3)', (el: Element) => el.textContent?.trim() || MISSING_PROPERTY);
+  const ratings = await page.$eval('.ratings > span', (el: Element) => getElementTextContent(el));
+  const description = await page.$eval('.recipe-header__preamble > p', (el: Element) => getElementTextContent(el));
+  const time = await page.evaluate('.recipe-header__summary > a', (el: Element) => getElementTextContent(el));
+  const amountOfIngredients = await page.evaluate('.recipe-header__summary > a:nth-child(2)', (el: Element) => getElementTextContent(el));
+  const difficulty = await page.evaluate('.recipe-header__summary > a:nth-child(3)', (el: Element) => getElementTextContent(el));
   const imageSrc = await page.$eval('.recipe-header__desktop-image-wrapper__inner > img', (el: Element) => el.getAttribute('src') || MISSING_PROPERTY);
   const ingredients = await page.$$eval('#ingredients .ingredients-list-group__card:not(.extra-content)', (items: NodeListOf<Element>) => {
     const ingredientsListGroup = Array.from(items);
